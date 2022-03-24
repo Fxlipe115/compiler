@@ -1,6 +1,7 @@
 %{
 #include "stdbool.h"
 #include "symbol_table.h"
+#include "syntax_tree.h"
 #include "y.tab.h"
 
 int line_count;
@@ -41,13 +42,13 @@ return      { return KW_RETURN; }
 ">="        { return OPERATOR_GE; }
 "=="        { return OPERATOR_EQ; }
 "!="        { return OPERATOR_DIF; }
-{ID}        { yylval.symbol = symbol_table_add(st, yytext, TK_IDENTIFIER); 
+{ID}        { yylval.symbol = symbol_table_add(st, yytext, symbol_identifier); 
               return TK_IDENTIFIER; }
-{CHAR}      { yylval.symbol = symbol_table_add(st, yytext, LIT_CHAR); 
+{CHAR}      { yylval.symbol = symbol_table_add(st, yytext, symbol_char_literal); 
               return LIT_CHAR; }
-{STRING}    { yylval.symbol = symbol_table_add(st, yytext, LIT_STRING); 
+{STRING}    { yylval.symbol = symbol_table_add(st, yytext, symbol_string_literal);
               return LIT_STRING; }
-{INT}       { yylval.symbol = symbol_table_add(st, yytext, LIT_INTEGER); 
+{INT}       { yylval.symbol = symbol_table_add(st, yytext, symbol_int_literal);
               return LIT_INTEGER; }
 
 "\\*"           { BEGIN(COMMENT); }

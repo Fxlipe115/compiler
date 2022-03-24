@@ -27,7 +27,7 @@ symbol_list_t* new_symbol_list();
 void delete_symbol_list(symbol_list_t* sl);
 
 symbol_t* symbol_list_add(symbol_list_t* sl, const char* value, 
-                          enum yytokentype type);
+                          symbol_type_t type);
 
 bool symbol_list_contains(symbol_list_t* sl, const char* key);
 
@@ -59,7 +59,7 @@ void delete_symbol_table(symbol_table_t* st) {
 }
 
 symbol_t* symbol_table_add(const symbol_table_t* st, const char* symbol, 
-                           enum yytokentype type) {
+                           symbol_type_t type) {
     size_t bucket_index = hash(symbol);
     if(!symbol_table_contains(st, symbol)) {
         return symbol_list_add(st->bucket[bucket_index], symbol, type);
@@ -103,7 +103,7 @@ void delete_symbol_list(symbol_list_t* sl) {
 }
 
 symbol_t* symbol_list_add(symbol_list_t* sl, const char* value, 
-                          enum yytokentype type) {
+                          symbol_type_t type) {
     symbol_list_node_t* new_node = malloc(sizeof(symbol_list_node_t));
     new_node->symbol = malloc(sizeof(symbol_t));
     

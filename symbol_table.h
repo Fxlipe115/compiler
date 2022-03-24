@@ -6,13 +6,20 @@
 
 typedef struct symbol_table symbol_table_t;
 
-// workaround for y.tab.h not containing symbol_t and ast_node_t definitions
+typedef enum symbol_type {
+    symbol_int_literal,
+    symbol_char_literal,
+    symbol_string_literal,
+    symbol_identifier,
+    symbol_variable,
+    symbol_vector,
+    symbol_function
+} symbol_type_t;
+
 typedef struct symbol symbol_t;
-typedef struct ast_node ast_node_t;
-#include "y.tab.h"
 struct symbol {
     char* value;
-    enum yytokentype type;
+    symbol_type_t type;
 };
 
 symbol_table_t* new_symbol_table();
@@ -20,7 +27,7 @@ symbol_table_t* new_symbol_table();
 void delete_symbol_table(symbol_table_t* st);
 
 symbol_t* symbol_table_add(const symbol_table_t* st, const char* symbol, 
-                           enum yytokentype type);
+                           symbol_type_t type);
 
 bool symbol_table_contains(const symbol_table_t* st, const char* key);
 
