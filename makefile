@@ -11,6 +11,8 @@ SOURCE:= $(wildcard *.c) $(LEX_OUT) $(YACC_OUT)
 OBJ:= $(SOURCE:.c=.o)
 HEADERS:= lex.yy.h y.tab.h
 
+.PHONY: all clean
+
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
@@ -25,7 +27,6 @@ $(LEX_OUT) lex.yy.h: $(LEX_IN)
 $(YACC_OUT) y.tab.h: $(YACC_IN)
 	yacc -vtd $<
 
-.PHONY: clean
 clean:
 	rm $(OBJ) $(YACC_OUT) $(LEX_OUT) $(HEADERS) y.output
 
