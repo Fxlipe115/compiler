@@ -28,5 +28,5 @@ $(YACC_OUT) y.tab.h: $(YACC_IN)
 	yacc -vtd $<
 
 clean:
-	rm $(OBJ) $(YACC_OUT) $(LEX_OUT) $(HEADERS) y.output
+	rm -f $(OBJ) $(YACC_OUT) $(LEX_OUT) $(HEADERS) y.output
 
