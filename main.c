@@ -6,6 +6,7 @@
 #include "lex.yy.h"
 #include "lex_helper_functions.h"
 #include "yacc_helper_functions.h"
+#include "error_codes.h"
 
 int main(int argc, char** argv){
     FILE* source_file;
@@ -16,22 +17,22 @@ int main(int argc, char** argv){
     const bool print_symbol_table = false;
     const bool print_syntax_table = false;
 
-    if (argc < 3) {
+    if (argc < 3 || argc > 3) {
         fprintf(stderr, "Usage: etapa3 SOURCEFILE OUTFILE");
-        exit(1);
+        exit(FILES_NOT_PROVIDED);
     }
 
     source_file = fopen(argv[1], "r");
     if (source_file == NULL) {
         perror("Error openning source file");
-        exit(1);
+        exit(FILE_OPEN_ERROR);
     }
 
 
     out_file = fopen(argv[2], "w");
     if (out_file == NULL) {
         perror("Error writing to output file");
-        exit(1);
+        exit(FILE_OPEN_ERROR);
     }
     
     symbol_table_t* symbol_table = new_symbol_table();

@@ -405,6 +405,7 @@ string_literal: LIT_STRING
 #include <stdlib.h>
 #include "lex_helper_functions.h"
 #include "yacc_helper_functions.h"
+#include "error_codes.h"
 
 void yacc_init(ast_t* syntax_tree) {
     ast = syntax_tree;
@@ -412,6 +413,6 @@ void yacc_init(ast_t* syntax_tree) {
 
 int yyerror(const char* error_message) {
     fprintf(stderr, "Line %d: %s\n", getLineNumber(), error_message);
-    exit(3);
+    exit(SYNTAX_ERROR);
 }
 
