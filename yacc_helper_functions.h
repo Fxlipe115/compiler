@@ -5,4 +5,6 @@
 
 void yacc_init(ast_t* ast);
 
+bool syntax_error_occured();
+
 #endif

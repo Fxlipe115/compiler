@@ -407,12 +407,18 @@ string_literal: LIT_STRING
 #include "yacc_helper_functions.h"
 #include "error_codes.h"
 
+bool has_syntax_error = false;
+
 void yacc_init(ast_t* syntax_tree) {
     ast = syntax_tree;
 }
 
+bool syntax_error_occured() {
+    return has_syntax_error;
+}
+
 int yyerror(const char* error_message) {
-    fprintf(stderr, "Line %d: %s\n", getLineNumber(), error_message);
-    exit(SYNTAX_ERROR);
+    has_syntax_error = true;
+    return fprintf(stderr, "Line %d: %s\n", getLineNumber(), error_message);
 }
 

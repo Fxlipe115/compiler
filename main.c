@@ -38,6 +38,9 @@ int main(int argc, char** argv){
     yyset_in(source_file);
     yacc_init(ast);
     yyparse();
+    if(syntax_error_occured()) {
+        exit(SYNTAX_ERROR);
+    }
 
     if(args.print_symbol_table) {
         symbol_table_print(stderr, symbol_table);
