@@ -8,6 +8,7 @@
 #include "yacc_helper_functions.h"
 #include "error_codes.h"
 #include "argparse.h"
+#include "semantic.h"
 
 int main(int argc, char** argv){
     FILE* source_file;
@@ -51,6 +52,7 @@ int main(int argc, char** argv){
     }
 
     decompile(out_file, ast);
+    check_semantic_errors(ast, symbol_table);
 
     delete_symbol_table(symbol_table);
     delete_ast(ast);
