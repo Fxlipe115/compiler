@@ -7,7 +7,7 @@ LEX_IN:= scanner.l
 LEX_OUT:= lex.yy.c
 YACC_IN:= parser.y
 YACC_OUT:= y.tab.c
-SOURCE:= main.c symbol_table.c syntax_tree.c $(LEX_OUT) $(YACC_OUT)
+SOURCE:= main.c symbol_table.c syntax_tree.c argparse.c $(LEX_OUT) $(YACC_OUT)
 OBJ:= $(SOURCE:.c=.o)
 HEADERS:= lex.yy.h y.tab.h
 
@@ -22,6 +22,7 @@ $(TARGET): $(OBJ)
 main.o: main.c $(HEADERS)
 symbol_table.o: symbol_table.c $(HEADERS)
 syntax_tree.o: syntax_tree.c $(HEADERS)
+argparse.o: argparse.c $(HEADERS)
 lex.yy.o: lex.yy.c $(HEADERS)
 y.tab.o: y.tab.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@

@@ -1,7 +1,7 @@
 #ifndef ERROR_CODES_H
 #define ERROR_CODES_H
 
-#define FILES_NOT_PROVIDED 1
+#define ARGUMENTS_ERROR 1
 #define FILE_OPEN_ERROR 2
 #define SYNTAX_ERROR 3
 #define SEMANTIC_ERROR 4
