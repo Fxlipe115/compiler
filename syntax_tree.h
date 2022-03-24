@@ -3,9 +3,11 @@
 
 #include "symbol_table.h"
 
+typedef struct ast ast_t;
+
 typedef struct ast_node ast_node_t;
 
-typedef struct ast ast_t;
+typedef struct ast_node_list ast_node_list_t;
 
 typedef enum ast_node_type {
     ast_symbol,
@@ -54,13 +56,25 @@ ast_t* new_ast();
 
 void ast_set_root(ast_t* ast, ast_node_t* root);
 
+ast_node_t* ast_get_root(ast_t* ast);
+
 void delete_ast(ast_t* ast);
 
 ast_node_t* new_ast_node(ast_node_type_t type, size_t children_quantity,...);
 
 ast_node_t* new_ast_symbol_node(symbol_t* symbol);
 
+symbol_t* ast_node_get_symbol(ast_node_t* node);
+
+ast_node_type_t ast_node_get_type(ast_node_t* node);
+
+ast_node_list_t* ast_node_get_children(ast_node_t* node);
+
 void delete_ast_node(ast_node_t* node);
+
+ast_node_t* ast_node_list_begin(ast_node_list_t* list);
+
+ast_node_t* ast_node_list_next(ast_node_list_t* list);
 
 void ast_print(FILE* stream, ast_t* ast);
 

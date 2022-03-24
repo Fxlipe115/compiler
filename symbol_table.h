@@ -16,9 +16,16 @@ typedef enum symbol_type {
     symbol_function
 } symbol_type_t;
 
+typedef enum symbol_data_type {
+    symbol_type_int,
+    symbol_type_char,
+    symbol_type_float
+} symbol_data_type_t;
+
 typedef struct symbol {
     char* value;
     symbol_type_t type;
+    symbol_data_type_t data_type;
 } symbol_t;
 
 symbol_table_t* new_symbol_table();
@@ -27,6 +34,9 @@ void delete_symbol_table(symbol_table_t* st);
 
 symbol_t* symbol_table_add(const symbol_table_t* st, const char* symbol, 
                            symbol_type_t type);
+
+
+symbol_t* symbol_table_get(symbol_table_t* st, const char* key);
 
 bool symbol_table_contains(const symbol_table_t* st, const char* key);
 
