@@ -2,7 +2,7 @@
 
 CC:= gcc
 CFLAGS:= -Wall -O0 -ggdb3
-TARGET:= etapa3
+TARGET:= etapa4
 LEX_IN:= scanner.l
 LEX_OUT:= lex.yy.c
 YACC_IN:= parser.y

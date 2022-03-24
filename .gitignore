@@ -1,2 +1,8 @@
 etapa*
 *.o
+.*.swp
+lex.yy.c
+lex.yy.h
+y.output
+y.tab.c
+y.tab.h
