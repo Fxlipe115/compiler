@@ -16,11 +16,10 @@ typedef enum symbol_type {
     symbol_function
 } symbol_type_t;
 
-typedef struct symbol symbol_t;
-struct symbol {
+typedef struct symbol {
     char* value;
     symbol_type_t type;
-};
+} symbol_t;
 
 symbol_table_t* new_symbol_table();
 

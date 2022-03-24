@@ -2,8 +2,8 @@
 #include <stdlib.h>
 
 #include "syntax_tree.h"
-#include "y.tab.h"
-#include "lex.yy.h"
+#include "parser.h"
+#include "scanner.h"
 #include "lex_helper_functions.h"
 #include "yacc_helper_functions.h"
 #include "error_codes.h"

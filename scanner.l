@@ -1,8 +1,7 @@
 %{
 #include "stdbool.h"
 #include "symbol_table.h"
-#include "syntax_tree.h"
-#include "y.tab.h"
+#include "parser.h"
 
 int line_count;
 bool is_running;
