@@ -69,6 +69,9 @@ ast_t* ast = NULL;
 %left '+' '-'
 %left '*' '/'
 
+%nonassoc REDUCE
+%nonassoc KW_ELSE
+
 %start program
 
 %%
@@ -256,34 +259,34 @@ printable_list: string_literal printable_list_rest
 
 printable_list_rest: ',' string_literal printable_list_rest
                    {
-             $$ = new_ast_node(ast_print_arg, 2, $2, $3);
-         }
+                       $$ = new_ast_node(ast_print_arg, 2, $2, $3);
+                   }
                    | ',' expr printable_list_rest
-         {
-             $$ = new_ast_node(ast_print_arg, 2, $2, $3);
-         }
+                   {
+                       $$ = new_ast_node(ast_print_arg, 2, $2, $3);
+                   }
                    |
-         {
-             $$ = NULL;
-         }
+                   {
+                       $$ = NULL;
+                   }
                    ;
 
-flux_control: KW_IF expr KW_THEN cmd
+flux_control: KW_IF expr KW_THEN cmd %prec REDUCE
             {
-             $$ = new_ast_node(ast_if, 2, $2, $4);
-         }
-            | KW_IF expr KW_THEN cmd KW_ELSE cmd
-         {
-             $$ = new_ast_node(ast_if_else, 3, $2, $4, $6);
-         }
-            | KW_WHILE expr cmd
-         {
-             $$ = new_ast_node(ast_while, 2, $2, $3);
-         }
-            | KW_GOTO identifier
-         {
-             $$ = new_ast_node(ast_goto, 1, $2);
-         }
+                $$ = new_ast_node(ast_if, 2, $2, $4);
+            }
+                | KW_IF expr KW_THEN cmd KW_ELSE cmd
+            {
+                $$ = new_ast_node(ast_if_else, 3, $2, $4, $6);
+            }
+                | KW_WHILE expr cmd
+            {
+                $$ = new_ast_node(ast_while, 2, $2, $3);
+            }
+                | KW_GOTO identifier
+            {
+                $$ = new_ast_node(ast_goto, 1, $2);
+            }
             ;
 
 expr: identifier                     
