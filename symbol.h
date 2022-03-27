@@ -3,6 +3,10 @@
 
 #include "data_type.h"
 
+#define SYMBOL_SCOPE_GLOBAL NULL
+
+typedef struct symbol symbol_t;
+
 typedef enum symbol_type {
     symbol_int_literal,
     symbol_char_literal,
@@ -10,14 +14,16 @@ typedef enum symbol_type {
     symbol_identifier,
     symbol_variable,
     symbol_vector,
-    symbol_function
+    symbol_function,
+    symbol_parameter
 } symbol_type_t;
 
 
-typedef struct symbol {
+struct symbol {
     char* value;
     symbol_type_t type;
     data_type_t data_type;
-} symbol_t;
+    symbol_t* scope;
+};
 
 #endif

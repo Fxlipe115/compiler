@@ -16,9 +16,9 @@ void delete_symbol_list(symbol_list_t* sl);
 symbol_t* symbol_list_add(symbol_list_t* sl, const char* value, 
                           symbol_type_t type);
 
-bool symbol_list_contains(symbol_list_t* sl, const char* key);
+bool symbol_list_contains(symbol_list_t* sl, const char* key, symbol_t* scope);
 
-symbol_t* symbol_list_search(symbol_list_t* sl, const char* key);
+symbol_t* symbol_list_search(symbol_list_t* sl, const char* key, symbol_t* scope);
 
 void symbol_list_print(FILE* stream, symbol_list_t* sl);
 

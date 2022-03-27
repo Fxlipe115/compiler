@@ -54,6 +54,7 @@ symbol_t* symbol_list_add(symbol_list_t* sl, const char* value,
     new_node->symbol->value[value_length] = '\0';
     new_node->symbol->type = type;
     new_node->symbol->data_type = data_type_undefined;
+    new_node->symbol->scope = SYMBOL_SCOPE_GLOBAL;
     new_node->next = sl->first;
 
     sl->size++;
@@ -63,10 +64,10 @@ symbol_t* symbol_list_add(symbol_list_t* sl, const char* value,
 }
 
 
-bool symbol_list_contains(symbol_list_t* sl, const char* key) {
+bool symbol_list_contains(symbol_list_t* sl, const char* key, symbol_t* scope) {
     symbol_list_node_t* node = sl->first;
     while (node != SYMBOL_LIST_END) {
-        if (strcmp(node->symbol->value, key) == 0) {
+        if (strcmp(node->symbol->value, key) == 0 && node->symbol->scope == scope) {
             return true;
         }
         node = node->next;
@@ -75,10 +76,10 @@ bool symbol_list_contains(symbol_list_t* sl, const char* key) {
 }
 
 
-symbol_t* symbol_list_search(symbol_list_t* sl, const char* key) {
+symbol_t* symbol_list_search(symbol_list_t* sl, const char* key, symbol_t* scope) {
     symbol_list_node_t* node = sl->first;
     while (node != SYMBOL_LIST_END) {
-        if (strcmp(node->symbol->value, key) == 0) {
+        if (strcmp(node->symbol->value, key) == 0 && node->symbol->scope == scope) {
             return node->symbol;
         }
         node = node->next;
