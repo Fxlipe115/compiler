@@ -220,41 +220,41 @@ cmd_block: '{' cmd_list '}'
 
 cmd_list: cmd ';' cmd_list
         {
-             $$ = new_ast_node(ast_cmd, 2, $1, $3);
-         }
+            $$ = new_ast_node(ast_cmd, 2, $1, $3);
+        }
         | identifier ':' cmd_list
-         {
-             $$ = new_ast_node(ast_label, 2, $1, $3);
-         }
+        {
+            $$ = new_ast_node(ast_label, 2, $1, $3);
+        }
         |
-         {
-             $$ = NULL;
-         }
+        {
+            $$ = NULL;
+        }
         ;
 
 attribution: identifier '=' expr                 
            {
-             $$ = new_ast_node(ast_assign, 2, $1, $3);
-         }
+               $$ = new_ast_node(ast_assign, 2, $1, $3);
+           }
            | identifier '[' expr ']' '=' expr
-         {
-             $$ = new_ast_node(ast_vector_assign, 3, $1, $3, $6);
-         }
+           {
+               $$ = new_ast_node(ast_vector_assign, 3, $1, $3, $6);
+           }
            ;
 
 
 printable_list: string_literal printable_list_rest
               {
-             $$ = new_ast_node(ast_print_arg, 2, $1, $2);
-         }
+                  $$ = new_ast_node(ast_print_arg, 2, $1, $2);
+              }
               | expr printable_list_rest
-         {
-             $$ = new_ast_node(ast_print_arg, 2, $1, $2);
-         }
+              {
+                  $$ = new_ast_node(ast_print_arg, 2, $1, $2);
+              }
               |
-         {
-             $$ = NULL;
-         }
+              {
+                  $$ = NULL;
+              }
               ;
 
 printable_list_rest: ',' string_literal printable_list_rest
