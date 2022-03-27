@@ -14,6 +14,8 @@ int check_expression_type(ast_node_t* expression_node, data_type_t expected_data
 
 int check_identifier(ast_node_t* identifier_node, symbol_type_t type, data_type_t data_type);
 
+int check_identifier_definition(ast_node_t* definition_node, ast_node_type_t type);
+
 data_type_t evaluate_expression_data_type(ast_node_t* expression_node);
 
 data_type_t evaluate_vector_data_type(ast_node_t* vector_node);
@@ -114,18 +116,26 @@ int check_identifier(ast_node_t* identifier_node, symbol_type_t type, data_type_
     return semantic_errors;
 }
 
-
 int check_vector_declaration(ast_node_t* declaration_node) {
     int semantic_errors = 0;
     ast_node_list_t* children = ast_node_get_children(declaration_node);
     ast_node_t* identifier_definition_node = ast_node_list_begin(children);
     
-    data_type_t data_type = evaluate_identifier_definition_data_type(identifier_definition_node);
-    semantic_errors += check_identifier(identifier_definition_node, symbol_vector, data_type);
+    semantic_errors += check_identifier_definition(identifier_definition_node, symbol_vector);
 
     return semantic_errors;
 }
 
+
+int check_identifier_definition(ast_node_t* definition_node, ast_node_type_t type) {
+    int semantic_errors = 0;
+    ast_node_list_t* children = ast_node_get_children(definition_node);
+    ast_node_t* identifier_node = ast_node_list_begin(children);
+
+    data_type_t data_type = evaluate_identifier_definition_data_type(definition_node);
+    semantic_errors += check_identifier(identifier_node, symbol_vector, data_type);
+    return semantic_errors;
+}
 
 int check_function_declaration(ast_node_t* declaration_node) {
     int semantic_errors = 0;
