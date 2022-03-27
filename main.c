@@ -60,7 +60,7 @@ int main(int argc, char** argv){
     fclose(source_file);
     fclose(out_file);
 
-    printf("File %s created successfully!\n", argv[2]);
+    printf("File %s created successfully!\n", args.output_file);
     exit(EXIT_SUCCESS);
 }
 
