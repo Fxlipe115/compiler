@@ -172,7 +172,7 @@ parameter_list: identifier_def parameter_list_rest
               }
               | 
               {
-                  $$ = NULL;
+                  $$ = new_ast_node(ast_func_param, 0);
               }
               ;
 
@@ -182,7 +182,7 @@ parameter_list_rest: ',' identifier_def parameter_list_rest
                    }
                    | 
                    {
-                       $$ = NULL;
+                       $$ = new_ast_node(ast_func_param, 0);
                    }
                    ;
 

@@ -147,7 +147,9 @@ ast_node_t* ast_node_list_begin(ast_node_list_t* list) {
 }
 
 ast_node_t* ast_node_list_next(ast_node_list_t* list) {
-    list->current = list->current->next;
+    if(list->current != NULL) {
+        list->current = list->current->next;
+    }
     return list->current != NULL ? list->current->node : NULL;
 }
 
