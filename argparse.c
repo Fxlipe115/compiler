@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <stdio.h>
+#include <libgen.h>
 
+void print_usage(char* program_name);
 
-void print_usage(const char* program_name);
-
-void print_help(const char* program_name);
+void print_help(char* program_name);
 
 argparse_error_t parse_arguments(int argc, char** argv, arguments_t* arguments) {
     arguments->print_parser_steps = 0;
@@ -74,17 +74,17 @@ argparse_error_t parse_arguments(int argc, char** argv, arguments_t* arguments) 
 }
 
 const char* usage_string() {
-    return "Usage: etapa4 [OPTION...] source_file output_file";
+    return "Usage: %s [OPTION...] source_file output_file";
 }
 
-void print_usage(const char* program_name) {
-    fprintf(stderr, "%s\n"
+void print_usage(char* program_name) {
+    fprintf(stderr, "Usage: %s [OPTION...] source_file output_file\n"
             "Try `%s --help' for more information.\n", 
-            usage_string(), program_name);
+            basename(program_name), program_name);
 }
 
-void print_help(const char* program_name) {
-    fprintf(stderr, "%s\n"
+void print_help(char* program_name) {
+    fprintf(stderr, "Usage: %s [OPTION...] source_file output_file\n"
             "    UFRGS Compilers discipline assignment.\n"
             "\n"
             "    -a, --print-syntax-tree    Print the Abstract Syntax Tree generated\n"
@@ -99,6 +99,6 @@ void print_help(const char* program_name) {
             "Author: Felipe de Almeida Graeff.\n"
             "\n"
             "Report bugs to <felipe.graeff@inf.ufrgs.br>.\n",
-            usage_string());
+            basename(program_name));
 }
 
