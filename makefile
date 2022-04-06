@@ -1,7 +1,7 @@
 #!/usr/bin/env make
 
 CC:= gcc
-TARGET:= etapa4
+TARGET:= etapa5
 LEX_IN:= scanner.l
 LEX_OUT:= lex.yy.c
 YACC_IN:= parser.y
