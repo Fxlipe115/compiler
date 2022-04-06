@@ -8,7 +8,8 @@ YACC_IN:= parser.y
 YACC_OUT:= y.tab.c
 SOURCE:= $(wildcard *.c) $(LEX_OUT) $(YACC_OUT)
 OBJ:= $(SOURCE:.c=.o)
-HEADERS:= lex.yy.h y.tab.h
+DEPFILES:= $(SOURCE:.c=.d)
+DEPFLAGS= -MT $@ -MMD -MP -MF $*.d
 
 .PHONY: all clean
 
@@ -21,10 +22,11 @@ debug: CFLAGS:= -Wall -O0 -ggdb3
 debug: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) -o $@ $^ $(CFLAGS)
 
-%.o: %.c $(HEADERS)
-	$(CC) $(CFLAGS) -c $< -o $@
+%.o: %.c
+%.o: %.c %.d
+	$(CC) -c $< -o $@ $(DEPFLAGS) $(CFLAGS)
 
 $(LEX_OUT) lex.yy.h: $(LEX_IN)
 	lex -d --header-file=$(@:.c=.h) $<
@@ -32,6 +34,9 @@ $(LEX_OUT) lex.yy.h: $(LEX_IN)
 $(YACC_OUT) y.tab.h: $(YACC_IN)
 	yacc -vtd $<
 
+$(DEPFILES):
+include $(wildcard $(DEPFILES))
+
 clean:
-	rm -f $(OBJ) $(YACC_OUT) $(LEX_OUT) $(HEADERS) y.output
+	rm -f $(OBJ) $(YACC_OUT) $(LEX_OUT) $(DEPFILES) y.output
 

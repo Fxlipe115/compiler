@@ -1,5 +1,6 @@
 etapa*
 *.o
+*.d
 .*.swp
 lex.yy.c
 lex.yy.h
