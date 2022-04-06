@@ -12,6 +12,7 @@ struct ast {
 struct ast_node {
     ast_node_type_t type;
     symbol_t* symbol;
+    symbol_t* scope;
     ast_node_list_t* children;
 };
 
@@ -25,6 +26,8 @@ struct ast_node_list {
     ast_node_list_node_t* current;
     size_t size;
 };
+
+void ast_set_scope(ast_node_t* node, symbol_t* scope);
 
 ast_node_list_t* new_ast_node_list();
 void delete_ast_node_list(ast_node_list_t* list);
@@ -46,7 +49,26 @@ ast_t* new_ast() {
 }
 
 void ast_set_root(ast_t* ast, ast_node_t* root) {
+    ast_set_scope(root, SYMBOL_SCOPE_GLOBAL);
     ast->root = root;
+}
+
+void ast_set_scope(ast_node_t* node, symbol_t* scope) {
+    if(node == NULL) {
+        return;
+    }
+
+    if(node->type == ast_decl) {
+        scope = SYMBOL_SCOPE_GLOBAL;
+    } else if(node->type == ast_func_decl) {
+        ast_node_t* function_identifier = node->children->first->node->children->first->node;
+        scope = function_identifier->symbol;
+    }
+
+    node->scope = scope;
+    for(ast_node_list_node_t* child = node->children->first; child != NULL; child = child->next) {
+        ast_set_scope(child->node, scope);
+    }
 }
 
 ast_node_t* ast_get_root(ast_t* ast) {
@@ -88,6 +110,10 @@ ast_node_t* new_ast_symbol_node(symbol_t* symbol) {
 
 symbol_t* ast_node_get_symbol(ast_node_t* node) {
     return node->symbol;
+}
+
+symbol_t* ast_node_get_scope(ast_node_t* node) {
+    return node->scope;
 }
 
 ast_node_type_t ast_node_get_type(ast_node_t* node) {
@@ -555,4 +581,3 @@ void ast_abstract_node_list_print(FILE* stream, ast_node_t* node,
         next_element = ast_node_list_next(element->children);
     }
 }
-

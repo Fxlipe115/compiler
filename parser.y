@@ -208,7 +208,7 @@ cmd: cmd_block
    }
    |
    {
-       $$ = NULL;
+       $$ = new_ast_node(ast_cmd, 0);
    }
    ;
 

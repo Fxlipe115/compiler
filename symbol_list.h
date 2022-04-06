@@ -7,6 +7,9 @@
 
 #define SYMBOL_LIST_END NULL
 
+typedef struct symbol symbol_t;
+typedef enum symbol_type symbol_type_t;
+
 typedef struct symbol_list symbol_list_t;
 
 symbol_list_t* new_symbol_list();
@@ -14,7 +17,9 @@ symbol_list_t* new_symbol_list();
 void delete_symbol_list(symbol_list_t* sl);
 
 symbol_t* symbol_list_add(symbol_list_t* sl, const char* value, 
-                          symbol_type_t type);
+                          symbol_type_t type, int first_defined_at_line, symbol_t* scope);
+
+symbol_t* symbol_list_add_symbol(symbol_list_t* sl, symbol_t* symbol);
 
 bool symbol_list_contains(symbol_list_t* sl, const char* key, symbol_t* scope);
 

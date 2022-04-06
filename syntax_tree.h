@@ -66,6 +66,8 @@ ast_node_t* new_ast_symbol_node(symbol_t* symbol);
 
 symbol_t* ast_node_get_symbol(ast_node_t* node);
 
+symbol_t* ast_node_get_scope(ast_node_t* node);
+
 ast_node_type_t ast_node_get_type(ast_node_t* node);
 
 ast_node_list_t* ast_node_get_children(ast_node_t* node);

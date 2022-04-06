@@ -43,6 +43,14 @@ int main(int argc, char** argv){
         exit(SYNTAX_ERROR);
     }
 
+    if(check_semantic_errors(ast, symbol_table) > 0) {
+        fprintf(stderr, "Compilation failed.\n");
+        exit(SEMANTIC_ERROR);
+    } else {
+        decompile(out_file, ast);
+        fprintf(stderr, "File %s created successfully!\n", args.output_file);
+    }
+
     if(args.print_symbol_table) {
         symbol_table_print(stderr, symbol_table);
     }
@@ -51,16 +59,12 @@ int main(int argc, char** argv){
         ast_print(stderr, ast);
     }
 
-    decompile(out_file, ast);
-    check_semantic_errors(ast, symbol_table);
-
     delete_symbol_table(symbol_table);
     delete_ast(ast);
 
     fclose(source_file);
     fclose(out_file);
 
-    printf("File %s created successfully!\n", args.output_file);
     exit(EXIT_SUCCESS);
 }
 

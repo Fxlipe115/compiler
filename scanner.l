@@ -41,13 +41,13 @@ return      { return KW_RETURN; }
 ">="        { return OPERATOR_GE; }
 "=="        { return OPERATOR_EQ; }
 "!="        { return OPERATOR_DIF; }
-{ID}        { yylval.symbol = symbol_table_add(st, yytext, symbol_identifier); 
+{ID}        { yylval.symbol = symbol_table_add(st, yytext, symbol_identifier, line_count); 
               return TK_IDENTIFIER; }
-{CHAR}      { yylval.symbol = symbol_table_add(st, yytext, symbol_char_literal); 
+{CHAR}      { yylval.symbol = symbol_table_add(st, yytext, symbol_char_literal, line_count); 
               return LIT_CHAR; }
-{STRING}    { yylval.symbol = symbol_table_add(st, yytext, symbol_string_literal);
+{STRING}    { yylval.symbol = symbol_table_add(st, yytext, symbol_string_literal, line_count);
               return LIT_STRING; }
-{INT}       { yylval.symbol = symbol_table_add(st, yytext, symbol_int_literal);
+{INT}       { yylval.symbol = symbol_table_add(st, yytext, symbol_int_literal, line_count);
               return LIT_INTEGER; }
 
 "\\*"           { BEGIN(COMMENT); }
