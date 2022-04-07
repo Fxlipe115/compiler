@@ -158,14 +158,14 @@ int check_identifier(ast_node_t* identifier_node, symbol_table_t* st, symbol_typ
             new_identifier->data_type = data_type;
             new_identifier->scope = scope;
             new_identifier->first_define_at_line = scope->first_define_at_line;
-            symbol_list_add_symbol(scope->parameters, new_identifier);
+            list_push_back(scope->parameters, new_identifier);
         // Case in scope of function and not declared as global
         } else {
             identifier->type = type;
             identifier->data_type = data_type;
             identifier->scope = scope;
             identifier->first_define_at_line = scope->first_define_at_line;
-            symbol_list_add_symbol(scope->parameters, identifier);
+            list_push_back(scope->parameters, identifier);
         }
     } else {
         fprintf(stderr, "%s: redeclared identifier '%s'. First declared on line %d as %s of type %s.\n",
@@ -253,7 +253,7 @@ int check_function_declaration(ast_node_t* declaration_node, symbol_table_t* st)
 
     semantic_errors += check_identifier_definition(identifier_definition_node, st, symbol_function, SYMBOL_SCOPE_GLOBAL);
 
-    scope->parameters = new_symbol_list();
+    scope->parameters = new_list();
     semantic_errors += check_parameter_list(parameter_list_node, st, scope);
 
     if(command_node != NULL) {
@@ -596,17 +596,17 @@ int check_function_call(ast_node_t* function_node, symbol_table_t* st, symbol_t*
         return semantic_errors;
     }
 
-    symbol_list_iterator_t* it = new_symbol_list_iterator(identifier->parameters);
-    while(symbol_list_iterator_get(it) != SYMBOL_LIST_END && arguments != NULL) {
+    list_iterator_t* it = list_begin(identifier->parameters);
+    while(list_current(it) != NULL && arguments != NULL) {
         ast_node_t* expression = ast_node_list_begin(ast_node_get_children(arguments));
-        symbol_t* current_parameter = symbol_list_iterator_get(it);
+        symbol_t* current_parameter = list_current(it);
         
         semantic_errors += check_expression_type(expression, current_parameter->data_type, st, scope);
 
         arguments = ast_node_list_next(ast_node_get_children(arguments));
-        symbol_list_iterator_next(it);
+        list_next(it);
     }
-    if(symbol_list_iterator_get(it) != SYMBOL_LIST_END) {
+    if(list_current(it) != NULL) {
         semantic_errors++;
         fprintf(stderr, "%s: too few arguments passed to function %s\n",
             scope == SYMBOL_SCOPE_GLOBAL ? "GLOBAL" : scope->value,
@@ -618,7 +618,7 @@ int check_function_call(ast_node_t* function_node, symbol_table_t* st, symbol_t*
             identifier->value);
     }
 
-    delete_symbol_list_iterator(it);
+    delete_list_iterator(it);
 
     return semantic_errors;
 }

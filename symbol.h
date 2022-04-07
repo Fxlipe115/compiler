@@ -2,7 +2,7 @@
 #define SYMBOL_H
 
 #include "data_type.h"
-#include "symbol_list.h"
+#include "list.h"
 
 #define SYMBOL_SCOPE_GLOBAL NULL
 
@@ -28,7 +28,15 @@ struct symbol {
     data_type_t data_type;
     symbol_t* scope;
     int first_define_at_line;
-    symbol_list_t* parameters;
+    list_t* parameters;
 };
+
+symbol_t* new_symbol(const char* value, symbol_type_t type, data_type_t data_type, 
+                    symbol_t* scope, int first_defined_at_line, 
+                    list_t* parameters);
+
+symbol_t* new_empty_symbol();
+
+void delete_symbol(symbol_t* symbol);
 
 #endif
