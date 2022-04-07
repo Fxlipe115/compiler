@@ -36,6 +36,9 @@ list_t* new_list() {
 
 
 void delete_list(list_t* list, void (*element_destructor)(list_element_t*)) {
+    if(list == NULL) {
+        return;
+    }
     while(!list_is_empty(list)) {
         list_element_t* element = list_front(list);
         if(element_destructor != NULL) {
@@ -55,7 +58,6 @@ void list_push_front(list_t* list, list_element_t* element) {
         list->first->previous = new_node;
     }
     new_node->previous = NULL;
-    new_node->next->previous = new_node;
     list->first = new_node;
     if(list->last == NULL) {
         list->last = new_node;

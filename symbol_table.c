@@ -49,13 +49,16 @@ bool symbol_comp(list_element_t* s1, list_element_t* s2) {
 
 symbol_t* symbol_table_add_symbol(const symbol_table_t* st, symbol_t* symbol) {
     size_t bucket_index = hash(symbol->value);
-    list_iterator_t* symbol_in_hash = list_find(list_begin(st->bucket[bucket_index]), symbol, &symbol_comp);
-    if(list_current(symbol_in_hash) == NULL) {
+    list_iterator_t* symbol_in_hash_it = list_find(list_begin(st->bucket[bucket_index]), symbol, &symbol_comp);
+    symbol_t* symbol_in_hash = list_current(symbol_in_hash_it);
+    delete_list_iterator(symbol_in_hash_it);
+    if(symbol_in_hash == NULL) {
         list_push_back(st->bucket[bucket_index], symbol);
         return symbol;
     } else {
-        return list_current(symbol_in_hash);
-    }    
+        delete_symbol(symbol);
+        return symbol_in_hash;
+    }
 }
 
 

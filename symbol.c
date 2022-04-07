@@ -31,6 +31,7 @@ symbol_t* new_empty_symbol() {
 
 
 void delete_symbol(symbol_t* symbol) {
+    delete_list(symbol->parameters, NULL);
     free(symbol->value);
     free(symbol);
 }
