@@ -76,7 +76,6 @@ symbol_t* symbol_table_get(symbol_table_t* st, char* key, symbol_t* scope) {
     symbol = list_current(it);
     delete_list_iterator(it);
     return symbol;
-    // return symbol_list_search(st->bucket[bucket_index], key, scope);
 }
 
 
