@@ -9,6 +9,7 @@
 #include "error_codes.h"
 #include "argparse.h"
 #include "semantic.h"
+#include "code_generator.h"
 
 int main(int argc, char** argv){
     FILE* source_file;
@@ -59,6 +60,9 @@ int main(int argc, char** argv){
     } else {
         decompile(out_file, ast);
         fprintf(stderr, "File %s created successfully!\n", args.output_file);
+
+        list_t* code = generate_code(ast, symbol_table);
+        print_code(code);
     }
 
     delete_symbol_table(symbol_table);
