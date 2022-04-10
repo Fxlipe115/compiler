@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <stdlib.h>
+#include "list.h"
 
 int check_and_set_node_types(ast_node_t* node, symbol_table_t* st);
 
@@ -110,12 +111,12 @@ int check_and_set_node_types(ast_node_t* node, symbol_table_t* st) {
             break;
         }
         
-        ast_node_list_t* children = ast_node_get_children(node);
-        ast_node_t* child = ast_node_list_begin(children);
-        while (child != NULL) {
-            semantic_errors += check_and_set_node_types(child, st);
-            child = ast_node_list_next(children);
+        list_iterator_t* it = list_begin(ast_node_get_children(node));
+        for(; list_current(it) != NULL; list_next(it)){
+            semantic_errors += check_and_set_node_types(list_current(it), st);
         }
+        delete_list_iterator(it);
+        
     }
 
     return semantic_errors;
@@ -129,8 +130,8 @@ int check_variable_declaration(ast_node_t* declaration_node, symbol_table_t* st,
            ast_node_get_type(declaration_node) == ast_float_decl);
 
     int semantic_errors = 0;
-    ast_node_list_t* children = ast_node_get_children(declaration_node);
-    ast_node_t* identifier_node = ast_node_list_begin(children);
+    list_t* children = ast_node_get_children(declaration_node);
+    ast_node_t* identifier_node = list_current(list_begin(children));
     
     semantic_errors += check_identifier(identifier_node, st, symbol_variable, data_type, SYMBOL_SCOPE_GLOBAL);
 
@@ -186,10 +187,11 @@ int check_vector_declaration(ast_node_t* declaration_node, symbol_table_t* st) {
            ast_node_get_type(declaration_node) == ast_vector_init_decl);
 
     int semantic_errors = 0;
-    ast_node_list_t* children = ast_node_get_children(declaration_node);
-    ast_node_t* identifier_definition_node = ast_node_list_begin(children);
-    ast_node_t* vector_size_node = ast_node_list_next(children);
-    ast_node_t* initialization_list_node = ast_node_list_next(children);
+    list_t* children = ast_node_get_children(declaration_node);
+    list_iterator_t* it = list_begin(children);
+    ast_node_t* identifier_definition_node = list_current(it);
+    ast_node_t* vector_size_node = list_current(list_next(it));
+    ast_node_t* initialization_list_node = list_current(list_next(it));
     
     semantic_errors += check_identifier_definition(identifier_definition_node, st, symbol_vector, SYMBOL_SCOPE_GLOBAL);
 
@@ -207,10 +209,10 @@ int check_initialization_list_size(ast_node_t* list_node, ast_node_t* size_node)
     int declared_size = atoi(ast_node_get_symbol(size_node)->value);
     int actual_list_size = 0;
 
-    ast_node_t* list_next = ast_node_list_next(ast_node_get_children(list_node));
+    ast_node_t* next = list_current(list_next(list_begin(ast_node_get_children(list_node))));
     actual_list_size++;
-    while(list_next != NULL) {
-        list_next = ast_node_list_next(ast_node_get_children(list_next));
+    while(next != NULL) {
+        next = list_current(list_next(list_begin(ast_node_get_children(next))));
         actual_list_size++;
     }
     
@@ -231,8 +233,8 @@ int check_identifier_definition(ast_node_t* definition_node, symbol_table_t* st,
            ast_node_get_type(definition_node) == ast_float_id_def);
 
     int semantic_errors = 0;
-    ast_node_list_t* children = ast_node_get_children(definition_node);
-    ast_node_t* identifier_node = ast_node_list_begin(children);
+    list_t* children = ast_node_get_children(definition_node);
+    ast_node_t* identifier_node = list_current(list_begin(children));
 
     data_type_t data_type = evaluate_identifier_definition_data_type(definition_node);
     semantic_errors += check_identifier(identifier_node, st, type, data_type, scope);
@@ -245,10 +247,11 @@ int check_function_declaration(ast_node_t* declaration_node, symbol_table_t* st)
     assert(ast_node_get_type(declaration_node) == ast_func_decl);
 
     int semantic_errors = 0;
-    ast_node_list_t* children = ast_node_get_children(declaration_node);
-    ast_node_t* identifier_definition_node = ast_node_list_begin(children);
-    ast_node_t* parameter_list_node = ast_node_list_next(children);
-    ast_node_t* command_node = ast_node_list_next(children);
+    list_t* children = ast_node_get_children(declaration_node);
+    list_iterator_t* it = list_begin(children);
+    ast_node_t* identifier_definition_node = list_current(it);
+    ast_node_t* parameter_list_node = list_current(list_next(it));
+    ast_node_t* command_node = list_current(list_next(it));
     symbol_t* scope = get_identifier_definition_symbol(identifier_definition_node);
 
     semantic_errors += check_identifier_definition(identifier_definition_node, st, symbol_function, SYMBOL_SCOPE_GLOBAL);
@@ -268,9 +271,10 @@ int check_parameter_list(ast_node_t* parameter_list_node, symbol_table_t* st, sy
     assert(ast_node_get_type(parameter_list_node) == ast_func_param);
 
     int semantic_errors = 0;
-    ast_node_list_t* parameters = ast_node_get_children(parameter_list_node);
-    ast_node_t* identifier_definition_node = ast_node_list_begin(parameters);
-    ast_node_t* parameter_list_rest = ast_node_list_next(parameters);
+    list_t* parameters = ast_node_get_children(parameter_list_node);
+    list_iterator_t* it = list_begin(parameters);
+    ast_node_t* identifier_definition_node = list_current(it);
+    ast_node_t* parameter_list_rest = list_current(list_next(it));
 
     if(identifier_definition_node != NULL) {
         semantic_errors += check_identifier_definition(identifier_definition_node, st, symbol_parameter, function);
@@ -322,10 +326,11 @@ int check_command(ast_node_t* command_node, symbol_table_t* st, symbol_t* scope)
 
 int check_if_else(ast_node_t* command_node, symbol_table_t* st, symbol_t* scope) {
     int semantic_errors = 0;
-    ast_node_list_t* children = ast_node_get_children(command_node);
-    ast_node_t* if_condition = ast_node_list_begin(children);
-    ast_node_t* then_expression = ast_node_list_next(children);
-    ast_node_t* else_expression = ast_node_list_next(children);
+    list_t* children = ast_node_get_children(command_node);
+    list_iterator_t* it = list_begin(children);
+    ast_node_t* if_condition = list_current(it);
+    ast_node_t* then_expression = list_current(list_next(it));
+    ast_node_t* else_expression = list_current(list_next(it));
 
     semantic_errors += check_expression_type(if_condition, data_type_bool, st, scope);
 
@@ -341,18 +346,19 @@ int check_if_else(ast_node_t* command_node, symbol_table_t* st, symbol_t* scope)
 
 int check_print(ast_node_t* command_node, symbol_table_t* st, symbol_t* scope) {
     int semantic_errors = 0;
-    ast_node_t* print_list = ast_node_list_begin(ast_node_get_children(command_node));
+    
+    ast_node_t* print_list = list_current(list_begin(ast_node_get_children(command_node)));
 
 
     while(print_list != NULL) {
-        ast_node_t* printable = ast_node_list_begin(ast_node_get_children(print_list));
+        ast_node_t* printable = list_current(list_begin(ast_node_get_children(print_list)));
         
         if(!(ast_node_get_type(printable) == ast_symbol && 
              ast_node_get_symbol(printable)->type == symbol_string_literal)) {
             semantic_errors += check_identifiers_in_expression(printable, st, scope);
         }
 
-        print_list = ast_node_list_next(ast_node_get_children(print_list));
+        print_list = list_current(list_next(list_begin(ast_node_get_children(print_list))));
     }
     
     return semantic_errors;
@@ -361,7 +367,7 @@ int check_print(ast_node_t* command_node, symbol_table_t* st, symbol_t* scope) {
 
 int check_return(ast_node_t* command_node, symbol_table_t* st, symbol_t* scope) {
     int semantic_errors = 0;
-    ast_node_t* return_value = ast_node_list_begin(ast_node_get_children(command_node));
+    ast_node_t* return_value = list_current(list_begin(ast_node_get_children(command_node)));
     semantic_errors += check_expression_type(return_value, scope->data_type, st, scope);
     return semantic_errors;
 }
@@ -378,8 +384,9 @@ int check_command_block(ast_node_t* command_block_node, symbol_table_t* st, symb
     assert(ast_node_get_type(command_block_node) == ast_cmd_block);
 
     int semantic_errors = 0;
-    ast_node_list_t* children = ast_node_get_children(command_block_node);
-    ast_node_t* command_list = ast_node_list_begin(children);
+    list_t* children = ast_node_get_children(command_block_node);
+    list_iterator_t* it = list_begin(children);
+    ast_node_t* command_list = list_current(it);
 
     if(command_list != NULL) {
         semantic_errors += check_command_list(command_list, st, scope);
@@ -394,9 +401,10 @@ int check_command_list(ast_node_t* command_list_node, symbol_table_t* st, symbol
            ast_node_get_type(command_list_node) == ast_label);
 
     int semantic_errors = 0;
-    ast_node_list_t* children = ast_node_get_children(command_list_node);
-    ast_node_t* command_or_label = ast_node_list_begin(children);
-    ast_node_t* command_list_rest = ast_node_list_next(children);
+    list_t* children = ast_node_get_children(command_list_node);
+    list_iterator_t* it = list_begin(children);
+    ast_node_t* command_or_label = list_current(it);
+    ast_node_t* command_list_rest = list_current(list_next(it));
 
     if(command_or_label != NULL) {
         if(ast_node_get_type(command_list_node) == ast_cmd) {
@@ -417,9 +425,10 @@ int check_assignment(ast_node_t* assignment_node, symbol_table_t* st, symbol_t* 
     assert(ast_node_get_type(assignment_node) == ast_assign);
 
     int semantic_errors = 0;
-    ast_node_list_t* children = ast_node_get_children(assignment_node);
-    ast_node_t* identifier_node = ast_node_list_begin(children);
-    ast_node_t* expression_node = ast_node_list_next(children);
+    list_t* children = ast_node_get_children(assignment_node);
+    list_iterator_t* it = list_begin(children);
+    ast_node_t* identifier_node = list_current(it);
+    ast_node_t* expression_node = list_current(list_next(it));
     symbol_t* identifier = ast_node_get_symbol(identifier_node);
 
     if(!is_identifier_valid_in_scope(st, identifier, scope)) {
@@ -451,10 +460,11 @@ int check_vector_assignment(ast_node_t* assignment_node, symbol_table_t* st, sym
     assert(ast_node_get_type(assignment_node) == ast_vector_assign);
 
     int semantic_errors = 0;
-    ast_node_list_t* children = ast_node_get_children(assignment_node);
-    ast_node_t* identifier_node = ast_node_list_begin(children);
-    ast_node_t* index_node = ast_node_list_next(children);
-    ast_node_t* expression_node = ast_node_list_next(children);
+    list_t* children = ast_node_get_children(assignment_node);
+    list_iterator_t* it = list_begin(children);
+    ast_node_t* identifier_node = list_current(it);
+    ast_node_t* index_node = list_current(list_next(it));
+    ast_node_t* expression_node = list_current(list_next(it));
     symbol_t* identifier = ast_node_get_symbol(identifier_node);
 
     if(!is_identifier_valid_in_scope(st, identifier, scope)) {
@@ -515,14 +525,14 @@ int check_expression_type(ast_node_t* expression_node, data_type_t expected_data
 
 int check_identifiers_in_expression(ast_node_t* expression_node, symbol_table_t* st, symbol_t* scope) {
     int semantic_errors = 0;
-
+    list_iterator_t* it = list_begin(ast_node_get_children(expression_node));
     switch(ast_node_get_type(expression_node)) {
     case ast_func_call:
         semantic_errors += check_function_call(expression_node, st, scope);
         break;
     case ast_vector_index:;
-        ast_node_t* vector_identifier_node = ast_node_list_begin(ast_node_get_children(expression_node));
-        ast_node_t* vector_index_node = ast_node_list_next(ast_node_get_children(expression_node));
+        ast_node_t* vector_identifier_node = list_current(it);
+        ast_node_t* vector_index_node = list_current(list_next(it));
         symbol_t* vector_identifier = ast_node_get_symbol(vector_identifier_node);
         if(!is_identifier_valid_in_scope(st, vector_identifier, scope)) {
             semantic_errors++;
@@ -560,23 +570,23 @@ int check_identifiers_in_expression(ast_node_t* expression_node, symbol_table_t*
         break;
 
     default:;
-        ast_node_list_t* children = ast_node_get_children(expression_node);
-        ast_node_t* child = ast_node_list_begin(children);
+        ast_node_t* child = list_current(it);
         while(child != NULL) {
             semantic_errors += check_identifiers_in_expression(child, st, scope);
-            child = ast_node_list_next(children);
+            child = list_current(list_next(it));
         }
         break;
     }
-    
+    delete_list_iterator(it);
     return semantic_errors;
 }
 
 int check_function_call(ast_node_t* function_node, symbol_table_t* st, symbol_t* scope) {
     int semantic_errors = 0;
-    ast_node_list_t* children = ast_node_get_children(function_node);
-    ast_node_t* identifier_node = ast_node_list_begin(children);
-    ast_node_t* arguments = ast_node_list_next(children);
+    list_t* children = ast_node_get_children(function_node);
+    list_iterator_t* it = list_begin(children);
+    ast_node_t* identifier_node = list_current(it);
+    ast_node_t* arguments = list_current(list_next(it));
     symbol_t* identifier = ast_node_get_symbol(identifier_node);
     
 
@@ -596,17 +606,18 @@ int check_function_call(ast_node_t* function_node, symbol_table_t* st, symbol_t*
         return semantic_errors;
     }
 
-    list_iterator_t* it = list_begin(identifier->parameters);
-    while(list_current(it) != NULL && arguments != NULL) {
-        ast_node_t* expression = ast_node_list_begin(ast_node_get_children(arguments));
-        symbol_t* current_parameter = list_current(it);
+    list_iterator_t* parameter_it = list_begin(identifier->parameters);
+    while(list_current(parameter_it) != NULL && arguments != NULL) {
+        list_iterator_t* argument_it = list_begin(ast_node_get_children(arguments));
+        ast_node_t* expression = list_current(argument_it);
+        symbol_t* current_parameter = list_current(parameter_it);
         
         semantic_errors += check_expression_type(expression, current_parameter->data_type, st, scope);
 
-        arguments = ast_node_list_next(ast_node_get_children(arguments));
-        list_next(it);
+        arguments = list_current(list_next(argument_it));
+        list_next(parameter_it);
     }
-    if(list_current(it) != NULL) {
+    if(list_current(parameter_it) != NULL) {
         semantic_errors++;
         fprintf(stderr, "%s: too few arguments passed to function %s\n",
             scope == SYMBOL_SCOPE_GLOBAL ? "GLOBAL" : scope->value,
@@ -737,9 +748,10 @@ bool are_compatible_data_types(data_type_t data_type1, data_type_t data_type2) {
 
 
 data_type_t evaluate_arithmetic_expression(ast_node_t* expression_node, symbol_table_t* st, symbol_t* scope) {
-    ast_node_list_t* operands = ast_node_get_children(expression_node);
-    ast_node_t* op1 = ast_node_list_begin(operands);
-    ast_node_t* op2 = ast_node_list_next(operands);
+    list_t* operands = ast_node_get_children(expression_node);
+    list_iterator_t* it = list_begin(operands);
+    ast_node_t* op1 = list_current(it);
+    ast_node_t* op2 = list_current(list_next(it));
     
     data_type_t op1_data_type = evaluate_expression_data_type(op1, st, scope);
     data_type_t op2_data_type = evaluate_expression_data_type(op2, st, scope);
@@ -753,9 +765,10 @@ data_type_t evaluate_arithmetic_expression(ast_node_t* expression_node, symbol_t
 
 
 data_type_t evaluate_boolean_expression(ast_node_t* expression_node, symbol_table_t* st, symbol_t* scope) {
-    ast_node_list_t* operands = ast_node_get_children(expression_node);
-    ast_node_t* op1 = ast_node_list_begin(operands);
-    ast_node_t* op2 = ast_node_list_next(operands);
+    list_t* operands = ast_node_get_children(expression_node);
+    list_iterator_t* it = list_begin(operands);
+    ast_node_t* op1 = list_current(it);
+    ast_node_t* op2 = list_current(list_next(it));
     
     data_type_t op1_data_type = evaluate_expression_data_type(op1, st, scope);
     data_type_t op2_data_type = evaluate_expression_data_type(op2, st, scope);
@@ -769,16 +782,18 @@ data_type_t evaluate_boolean_expression(ast_node_t* expression_node, symbol_tabl
 
 
 data_type_t evaluate_vector_data_type(ast_node_t* vector_node, symbol_table_t* st, symbol_t* scope) {
-    ast_node_list_t* children = ast_node_get_children(vector_node);
-    ast_node_t* identifier_node = ast_node_list_begin(children);
+    list_t* children = ast_node_get_children(vector_node);
+    list_iterator_t* it = list_begin(children);
+    ast_node_t* identifier_node = list_current(it);
 
     return evaluate_symbol_data_type(ast_node_get_symbol(identifier_node), st, scope);
 }
 
 
 data_type_t evaluate_function_data_type(ast_node_t* function_node, symbol_table_t* st, symbol_t* scope) {
-    ast_node_list_t* children = ast_node_get_children(function_node);
-    ast_node_t* identifier_node = ast_node_list_begin(children);
+    list_t* children = ast_node_get_children(function_node);
+    list_iterator_t* it = list_begin(children);
+    ast_node_t* identifier_node = list_current(it);
 
     return evaluate_symbol_data_type(ast_node_get_symbol(identifier_node), st, scope);
 }
@@ -808,8 +823,9 @@ symbol_t* get_identifier_definition_symbol(ast_node_t* identifier_definition_nod
            ast_node_get_type(identifier_definition_node) == ast_char_id_def ||
            ast_node_get_type(identifier_definition_node) == ast_float_id_def);
 
-    ast_node_list_t* children = ast_node_get_children(identifier_definition_node);
-    ast_node_t* identifier_node = ast_node_list_begin(children);
+    list_t* children = ast_node_get_children(identifier_definition_node);
+    list_iterator_t* it = list_begin(children);
+    ast_node_t* identifier_node = list_current(it);
     return ast_node_get_symbol(identifier_node);
 }
 

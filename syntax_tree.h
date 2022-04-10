@@ -2,12 +2,13 @@
 #define ABSTRACT_SYNTAX_TREE_H
 
 #include "symbol_table.h"
+#include "list.h"
 
 typedef struct ast ast_t;
 
 typedef struct ast_node ast_node_t;
 
-typedef struct ast_node_list ast_node_list_t;
+typedef list_t ast_list_t;
 
 typedef enum ast_node_type {
     ast_symbol,
@@ -70,13 +71,9 @@ symbol_t* ast_node_get_scope(ast_node_t* node);
 
 ast_node_type_t ast_node_get_type(ast_node_t* node);
 
-ast_node_list_t* ast_node_get_children(ast_node_t* node);
+ast_list_t* ast_node_get_children(ast_node_t* node);
 
 void delete_ast_node(ast_node_t* node);
-
-ast_node_t* ast_node_list_begin(ast_node_list_t* list);
-
-ast_node_t* ast_node_list_next(ast_node_list_t* list);
 
 void ast_print(FILE* stream, ast_t* ast);
 
