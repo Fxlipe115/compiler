@@ -39,4 +39,3 @@ include $(wildcard $(DEPFILES))
 
 clean:
 	rm -f $(OBJ) $(YACC_OUT) $(LEX_OUT) $(DEPFILES) y.output
-
