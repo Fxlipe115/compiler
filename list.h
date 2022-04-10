@@ -22,6 +22,8 @@ void list_pop_front(list_t* list);
 
 void list_pop_back(list_t* list);
 
+void list_merge(list_t* dest, list_t* other);
+
 list_element_t* list_front(list_t* list);
 
 list_element_t* list_back(list_t* list);

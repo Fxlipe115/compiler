@@ -5,15 +5,13 @@
 
 typedef struct list_node list_node_t;
 
-struct list
-{
+struct list {
     size_t size;
     list_node_t* first;
     list_node_t* last;
 };
 
-struct list_node
-{
+struct list_node {
     list_element_t* element;
     list_node_t* previous;
     list_node_t* next;
@@ -108,11 +106,36 @@ void list_pop_back(list_t* list) {
 }
 
 
+void list_merge(list_t* dest, list_t* other) {
+    while(list_size(other) > 0) {
+        list_push_back(dest, list_front(other));
+        list_pop_front(other);
+    }
+    delete_list(other, NULL);
+}
+
+
+void list_merge_at_beginning(list_t* dest, list_t* other) {
+    while(list_size(other) > 0) {
+        list_push_front(dest, list_back(other));
+        list_pop_back(other);
+    }
+    delete_list(other, NULL);
+}
+
+
 list_element_t* list_front(list_t* list) {
+    if(list == NULL || list->last == NULL) {
+        return NULL;
+    }
     return list->first->element;
 }
 
+
 list_element_t* list_back(list_t* list) {
+    if(list == NULL || list->last == NULL) {
+        return NULL;
+    }
     return list->last->element;
 }
 
@@ -139,7 +162,7 @@ list_iterator_t* list_find(list_iterator_t* it, list_element_t* element,
 list_iterator_t* list_begin(list_t* list) {
     list_iterator_t* it = malloc(sizeof(list_iterator_t));
     it->list = list;
-    it->current = list->first;
+    it->current = list == NULL ? NULL : list->first;
     return it;
 }
 
@@ -147,7 +170,7 @@ list_iterator_t* list_begin(list_t* list) {
 list_iterator_t* list_end(list_t* list) {
     list_iterator_t* it = malloc(sizeof(list_iterator_t));
     it->list = list;
-    it->current = list->last;
+    it->current = list == NULL ? NULL : list->last;
     return it;
 }
 
