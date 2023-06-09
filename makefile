@@ -1,7 +1,7 @@
 #!/usr/bin/env make
 
 CC:= gcc
-TARGET:= etapa5
+TARGET:= etapa6
 LEX_IN:= scanner.l
 LEX_OUT:= lex.yy.c
 YACC_IN:= parser.y
@@ -10,6 +10,10 @@ SOURCE:= $(wildcard *.c) $(LEX_OUT) $(YACC_OUT)
 OBJ:= $(SOURCE:.c=.o)
 DEPFILES:= $(SOURCE:.c=.d)
 DEPFLAGS= -MT $@ -MMD -MP -MF $*.d
+TESTSFOLDER:= tests
+TESTS:= $(wildcard $(TESTSFOLDER)/*.txt)
+TESTSASM:= $(TESTS:.txt=.s)
+TESTSEXE:= $(basename $(TESTSASM))
 
 .PHONY: all clean
 
@@ -38,4 +42,18 @@ $(DEPFILES):
 include $(wildcard $(DEPFILES))
 
 clean:
-	rm -f $(OBJ) $(YACC_OUT) $(LEX_OUT) $(DEPFILES) y.output
+	rm -f $(OBJ) $(YACC_OUT) $(LEX_OUT) $(DEPFILES) y.output $(TESTSASM) $(TESTSEXE)
+
+test: $(TESTSEXE)
+
+$(TESTSFOLDER)/%: $(TESTSFOLDER)/%.s
+	$(CC) -o $@ $< -Wa,-gdwarf-2
+	@echo "Executing $@:"
+	-@./$@
+	@echo
+
+.SECONDARY: $(TESTSASM) $(TESTSEXE)
+
+$(TESTSFOLDER)/%.s: $(TESTSFOLDER)/%.txt debug
+	@echo
+	./$(TARGET) $< $@

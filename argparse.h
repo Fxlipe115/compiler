@@ -10,6 +10,7 @@ typedef struct arguments {
     int print_scanner_steps;
     bool print_symbol_table;
     bool print_syntax_table;
+    bool print_tacs_list;
 } arguments_t;
 
 typedef enum argparse_error {

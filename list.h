@@ -6,6 +6,8 @@
 
 typedef struct list list_t;
 
+typedef struct list_node list_node_t;
+
 typedef struct list_iterator list_iterator_t;
 
 typedef void list_element_t;
@@ -24,6 +26,8 @@ void list_pop_back(list_t* list);
 
 void list_merge(list_t* dest, list_t* other);
 
+void list_merge_at_beginning(list_t* dest, list_t* other);
+
 list_element_t* list_front(list_t* list);
 
 list_element_t* list_back(list_t* list);
@@ -32,21 +36,24 @@ bool list_is_empty(list_t* list);
 
 size_t list_size(list_t* list);
 
-list_iterator_t* list_find(list_iterator_t* it, list_element_t* element, 
-                           bool (*comp)(list_element_t*, list_element_t*));
+list_iterator_t list_find(list_iterator_t it, list_element_t* element, 
+                          bool (*comp)(list_element_t*, list_element_t*));
 
-list_iterator_t* list_begin(list_t* list);
+list_iterator_t list_begin(list_t* list);
 
-list_iterator_t* list_end(list_t* list);
+list_iterator_t list_end(list_t* list);
 
-void delete_list_iterator(list_iterator_t* it);
+list_iterator_t list_next(list_iterator_t* it);
 
-list_iterator_t* list_next(list_iterator_t* it);
+list_iterator_t list_previous(list_iterator_t* it);
 
-list_iterator_t* list_previous(list_iterator_t* it);
-
-list_element_t* list_current(list_iterator_t* it);
+list_element_t* list_current(list_iterator_t it);
 
 void list_print(list_t* list, void (*printer)(list_element_t*));
+
+struct list_iterator {
+    list_t* list;
+    list_node_t* current;
+};
 
 #endif

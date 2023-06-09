@@ -3,8 +3,6 @@
 #include <stdlib.h>
 
 
-typedef struct list_node list_node_t;
-
 struct list {
     size_t size;
     list_node_t* first;
@@ -15,12 +13,6 @@ struct list_node {
     list_element_t* element;
     list_node_t* previous;
     list_node_t* next;
-};
-
-
-struct list_iterator {
-    list_t* list;
-    list_node_t* current;
 };
 
 
@@ -150,60 +142,55 @@ size_t list_size(list_t* list) {
 }
 
 
-list_iterator_t* list_find(list_iterator_t* it, list_element_t* element, 
-                           bool (*comp)(list_element_t*, list_element_t*)) {
+list_iterator_t list_find(list_iterator_t it, list_element_t* element, 
+                          bool (*comp)(list_element_t*, list_element_t*)) {
     while(list_current(it) != NULL && !comp(list_current(it), element)) {
-        list_next(it);
+        list_next(&it);
     }
     return it;
 }
 
 
-list_iterator_t* list_begin(list_t* list) {
-    list_iterator_t* it = malloc(sizeof(list_iterator_t));
-    it->list = list;
-    it->current = list == NULL ? NULL : list->first;
+list_iterator_t list_begin(list_t* list) {
+    list_iterator_t it;
+    it.list = list;
+    it.current = list == NULL ? NULL : list->first;
     return it;
 }
 
 
-list_iterator_t* list_end(list_t* list) {
-    list_iterator_t* it = malloc(sizeof(list_iterator_t));
-    it->list = list;
-    it->current = list == NULL ? NULL : list->last;
+list_iterator_t list_end(list_t* list) {
+    list_iterator_t it;
+    it.list = list;
+    it.current = list == NULL ? NULL : list->last;
     return it;
 }
 
 
-void delete_list_iterator(list_iterator_t* it) {
-    free(it);
-}
-
-
-list_iterator_t* list_next(list_iterator_t* it) {
+list_iterator_t list_next(list_iterator_t* it) {
     if(it->current != NULL) {
         it->current = it->current->next;
     }
-    return it;
+    return *it;
 }
 
 
-list_iterator_t* list_previous(list_iterator_t* it) {
+list_iterator_t list_previous(list_iterator_t* it) {
     if(it->current != NULL) {
         it->current = it->current->previous;
     }
-    return it;
+    return *it;
 }
 
 
-list_element_t* list_current(list_iterator_t* it) {
-    return it->current != NULL ? it->current->element : NULL;
+list_element_t* list_current(list_iterator_t it) {
+    return it.current != NULL ? it.current->element : NULL;
 }
 
 
 void list_print(list_t* list, void (*printer)(list_element_t*)) {
     if(printer != NULL) {
-        for(list_iterator_t* it = list_begin(list);  list_current(it) != NULL; list_next(it)) {
+        for(list_iterator_t it = list_begin(list);  list_current(it) != NULL; list_next(&it)) {
             printer(list_current(it));
         }
     }

@@ -13,6 +13,7 @@ argparse_error_t parse_arguments(int argc, char** argv, arguments_t* arguments) 
     arguments->print_scanner_steps = 0;
     arguments->print_symbol_table = false;
     arguments->print_syntax_table = false;
+    arguments->print_tacs_list = false;
 
     int c = 0;
     while (c != -1) {
@@ -22,6 +23,7 @@ argparse_error_t parse_arguments(int argc, char** argv, arguments_t* arguments) 
           {"print-scanner_steps", no_argument, NULL, 's'},
           {"print-symbol_table", no_argument, NULL, 't'},
           {"print-syntax_tree", no_argument, NULL, 'a'},
+          {"print_tacs_list", no_argument, NULL, 'l'},
           {"help", no_argument, NULL, 'h'},
           {"usage", no_argument, NULL, 'u'},
           {0, 0, 0, 0}
@@ -29,7 +31,7 @@ argparse_error_t parse_arguments(int argc, char** argv, arguments_t* arguments) 
       
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "pstah",
+        c = getopt_long (argc, argv, "pstalh",
                          long_options, &option_index);
 
         switch (c) {
@@ -44,6 +46,9 @@ argparse_error_t parse_arguments(int argc, char** argv, arguments_t* arguments) 
                 break;
             case 'a':
                 arguments->print_syntax_table = true;
+                break;
+            case 'l':
+                arguments->print_tacs_list = true;
                 break;
             case 'h':
                 print_help(argv[0]);
@@ -93,6 +98,7 @@ void print_help(char* program_name) {
             "    -s, --print-scanner-steps  Print LEX parsing steps\n"
             "    -t, --print-symbol-table   Print all the contents of the parser's\n"
             "                               symbol table\n"
+            "    -l, --print_tacs_list      Print list of generated TACS\n"
             "    -h, --help                 Give this help list\n"
             "        --usage                Give a short usage message\n"
             "\n"

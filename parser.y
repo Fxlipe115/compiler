@@ -251,10 +251,6 @@ printable_list: string_literal printable_list_rest
               {
                   $$ = new_ast_node(ast_print_arg, 2, $1, $2);
               }
-              |
-              {
-                  $$ = NULL;
-              }
               ;
 
 printable_list_rest: ',' string_literal printable_list_rest

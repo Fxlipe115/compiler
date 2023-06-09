@@ -71,10 +71,16 @@ char* tac_type_to_string(tac_type_t type) {
         return "tac_label";
     case tac_init:
         return "tac_init";
+    case tac_vector_uninit:
+        return "tac_vector_uninit";
     case tac_vector_init:
         return "tac_vector_init";
     case tac_vector_init_value:
         return "tac_vector_init_value";
+    case tac_temp:
+        return "tac_temp";
+    case tac_literal:
+        return "tac_literal";
     default:
         return "unknown type";
     }

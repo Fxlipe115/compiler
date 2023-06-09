@@ -12,6 +12,7 @@ struct ast_node {
     symbol_t* symbol;
     symbol_t* scope;
     ast_list_t* children;
+    data_type_t evaluated_data_type;
 };
 
 void ast_set_scope(ast_node_t* node, symbol_t* scope);
@@ -50,7 +51,7 @@ void ast_set_scope(ast_node_t* node, symbol_t* scope) {
     }
 
     node->scope = scope;
-    for(list_iterator_t* it = list_begin(node->children); list_current(it) != NULL; list_next(it)) {
+    for(list_iterator_t it = list_begin(node->children); list_current(it) != NULL; list_next(&it)) {
         ast_set_scope(list_current(it), scope);
     }
 }
@@ -96,6 +97,10 @@ symbol_t* ast_node_get_symbol(ast_node_t* node) {
     return node->symbol;
 }
 
+void ast_node_set_symbol(ast_node_t* node, symbol_t* symbol) {
+    node->symbol = symbol;
+}
+
 symbol_t* ast_node_get_scope(ast_node_t* node) {
     return node->scope;
 }
@@ -106,6 +111,14 @@ ast_node_type_t ast_node_get_type(ast_node_t* node) {
 
 ast_list_t* ast_node_get_children(ast_node_t* node) {
     return node->children;
+}
+
+data_type_t ast_node_get_evaluated_data_type(ast_node_t* node) {
+    return node->evaluated_data_type;
+}
+
+void ast_node_set_evaluated_data_type(ast_node_t* node, data_type_t evaluated_data_type) {
+    node->evaluated_data_type = evaluated_data_type;
 }
 
 
@@ -139,7 +152,7 @@ void ast_node_print(FILE* stream, ast_node_t* node, int depth) {
                 ast_type_to_string(node->type));
     }
     
-    for(list_iterator_t* it = list_begin(node->children); list_current(it) != NULL; list_next(it)) {
+    for(list_iterator_t it = list_begin(node->children); list_current(it) != NULL; list_next(&it)) {
         ast_node_print(stream, list_current(it), depth+1);
     }
 }
@@ -276,7 +289,7 @@ void ast_node_decompile(FILE* stream, ast_node_t* node) {
     if (node == NULL) {
         return;
     }
-    list_iterator_t* it = list_begin(node->children);
+    list_iterator_t it = list_begin(node->children);
     switch (node->type) {
         case ast_symbol:
             fprintf(stream, "%s", node->symbol->value);
@@ -286,45 +299,45 @@ void ast_node_decompile(FILE* stream, ast_node_t* node) {
             break;
         case ast_decl:
             ast_node_decompile(stream, list_current(it));
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
         case ast_int_decl:
             fprintf(stream, "int ");
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, ": ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             fprintf(stream, ";\n");
             break;
         case ast_char_decl:
             fprintf(stream, "char ");
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, ": ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             fprintf(stream, ";\n");
             break;
         case ast_float_decl:
             fprintf(stream, "float ");
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, ": ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             fprintf(stream, "/");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             fprintf(stream, ";\n");
             break;
         case ast_vector_decl:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, "[");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             fprintf(stream, "]");
             fprintf(stream, ";\n");
             break;
         case ast_vector_init_decl:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, "[");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             fprintf(stream, "]");
             fprintf(stream, ": ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             fprintf(stream, ";\n");
             break;
         case ast_vector_init_value:
@@ -334,13 +347,13 @@ void ast_node_decompile(FILE* stream, ast_node_t* node) {
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, "(");
             if(list_size(node->children) == 3) {
-                ast_node_decompile(stream, list_current(list_next(it)));
+                ast_node_decompile(stream, list_current(list_next(&it)));
             }
             fprintf(stream, ") ");
             if(list_size(node->children) < 3) {
-                ast_node_decompile(stream, list_current(list_next(it)));
+                ast_node_decompile(stream, list_current(list_next(&it)));
             } else {
-                ast_node_decompile(stream, list_current(list_next(it)));
+                ast_node_decompile(stream, list_current(list_next(&it)));
             }
             fprintf(stream, "\n");
             break;
@@ -368,81 +381,81 @@ void ast_node_decompile(FILE* stream, ast_node_t* node) {
         case ast_cmd:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, ";\n");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
         case ast_label:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, ":\n");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
         
         case ast_sum:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, " + ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
         case ast_sub:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, " - ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
         case ast_mul:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, " * ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
         case ast_div:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, " / ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
         case ast_lt:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, " < ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
         case ast_gt:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, " > ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
         case ast_le:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, " <= ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
         case ast_ge:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, " >= ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
         case ast_eq:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, " == ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
         case ast_dif:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, " != ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
 
         case ast_assign:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, " = ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
         case ast_vector_assign:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, "[");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             fprintf(stream, "] = ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
         case ast_vector_index:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, "[");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             fprintf(stream, "]");
             break;
         case ast_print_type:
@@ -466,7 +479,7 @@ void ast_node_decompile(FILE* stream, ast_node_t* node) {
         case ast_func_call:
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, "(");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             fprintf(stream, ")");
             break;
         case ast_func_arg:
@@ -476,45 +489,43 @@ void ast_node_decompile(FILE* stream, ast_node_t* node) {
             fprintf(stream, "if ");
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, " then ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
         case ast_if_else:
             fprintf(stream, "if ");
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, " then ");
             if(list_size(node->children) == 3) {
-                ast_node_decompile(stream, list_current(list_next(it)));
+                ast_node_decompile(stream, list_current(list_next(&it)));
             }
             fprintf(stream, " else ");
             if(list_size(node->children) < 3) {
-                ast_node_decompile(stream, list_current(list_next(it)));
+                ast_node_decompile(stream, list_current(list_next(&it)));
             } else {
-                ast_node_decompile(stream, list_current(list_next(it)));
+                ast_node_decompile(stream, list_current(list_next(&it)));
             }
             break;
         case ast_while:
             fprintf(stream, "while ");
             ast_node_decompile(stream, list_current(it));
             fprintf(stream, " ");
-            ast_node_decompile(stream, list_current(list_next(it)));
+            ast_node_decompile(stream, list_current(list_next(&it)));
             break;
         default:
             break;
     }
-    delete_list_iterator(it);
 }
 
 void ast_abstract_node_list_print(FILE* stream, ast_node_t* node, 
                                   const char* separator) {
     ast_node_t* element = node;
-    list_iterator_t* it = list_begin(element->children);
+    list_iterator_t it = list_begin(element->children);
     ast_node_decompile(stream, list_current(it));
-    ast_node_t* next_element = list_current(list_next(it));
+    ast_node_t* next_element = list_current(list_next(&it));
     while(next_element != NULL) {
         fprintf(stream, "%s", separator);
         element = next_element;
         ast_node_decompile(stream, list_current(it));
-        next_element = list_current(list_next(it));
+        next_element = list_current(list_next(&it));
     }
-    delete_list_iterator(it);
 }

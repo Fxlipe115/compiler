@@ -67,11 +67,17 @@ ast_node_t* new_ast_symbol_node(symbol_t* symbol);
 
 symbol_t* ast_node_get_symbol(ast_node_t* node);
 
+void ast_node_set_symbol(ast_node_t* node, symbol_t* symbol);
+
 symbol_t* ast_node_get_scope(ast_node_t* node);
 
 ast_node_type_t ast_node_get_type(ast_node_t* node);
 
 ast_list_t* ast_node_get_children(ast_node_t* node);
+
+data_type_t ast_node_get_evaluated_data_type(ast_node_t* node);
+
+void ast_node_set_evaluated_data_type(ast_node_t* node, data_type_t evaluated_data_type);
 
 void delete_ast_node(ast_node_t* node);
 

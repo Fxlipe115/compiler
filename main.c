@@ -10,6 +10,8 @@
 #include "argparse.h"
 #include "semantic.h"
 #include "code_generator.h"
+#include "assembly_generator.h"
+#include "tac.h"
 
 int main(int argc, char** argv){
     FILE* source_file;
@@ -45,7 +47,6 @@ int main(int argc, char** argv){
     }
 
     int semantic_errors = check_semantic_errors(ast, symbol_table);
-
     if(args.print_symbol_table) {
         symbol_table_print(stderr, symbol_table);
     }
@@ -58,11 +59,24 @@ int main(int argc, char** argv){
         fprintf(stderr, "Compilation failed.\n");
         exit(SEMANTIC_ERROR);
     } else {
-        decompile(out_file, ast);
-        fprintf(stderr, "File %s created successfully!\n", args.output_file);
 
         list_t* code = generate_code(ast, symbol_table);
-        print_code(code);
+
+        if(args.print_symbol_table) {
+            symbol_table_print(stderr, symbol_table);
+        }
+
+        if(args.print_syntax_table) {
+            ast_print(stderr, ast);
+        }
+        
+        if(args.print_tacs_list) {
+            print_code(code);
+        }
+
+        generate_assembly(out_file, code);
+        fprintf(stderr, "File %s created successfully!\n", args.output_file);
+        delete_list(code, (void (*)(list_element_t *))&delete_tac);
     }
 
     delete_symbol_table(symbol_table);

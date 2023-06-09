@@ -10,6 +10,9 @@ typedef list_t tac_list_t;
 
 typedef enum tac_type {
     tac_init,
+    tac_temp,
+    tac_literal,
+    tac_vector_uninit,
     tac_vector_init,
     tac_vector_init_value,
     tac_vector_index,
